@@ -54,7 +54,7 @@ class DataProcessor:
     except KeyError:
         print('Coluna nao encontrada')
                
-#*=============================== Exibir coluna condicional ===========================================================
+#*=============================== Exibir coluna condicional ==========================================================
 
     try:    
         def column_condicional(self, column_name, value):
@@ -87,7 +87,7 @@ class DataProcessor:
     except KeyError:
         print('Erro ao salvar arquivo')
 
-#*=========================== Converter para tipo numérico ===========================================================
+#*=========================== Converter para tipo numérico ==========================================================
 
     try:
         def type_numeric(self, column_name):
@@ -203,7 +203,17 @@ class DataProcessor:
 #*============================ Exibir valores ausentes ===============================================================
     def valores_ausentes(self, column_name):
         print(self.data[self.data[column_name].isnull()] == True)
+               
         
+#*=================== Remover valores de acordo com uma condição =====================================================
+    try:
+        def remove_rows(self, column_name,value_condition):
+            data_remove = self.data.loc[self.data[column_name] == value_condition]
+            self.data = self.data.drop(data_remove.index)
+            print('Valores removidos com sucesso')
+    except KeyError:
+        print('Erro ao remover linhas')
+            
 #?=================================================================================================================================================================        
 
 #*Criação de variável para leitura dos dados 
@@ -215,50 +225,51 @@ filial = 'Previa faturamento/Filiais.xlsx'
 data_processor = DataProcessor(file_path,filial)
         
 #!=================================================================================================================================================================
-#!Formatando a coluna CNPJ PRESTADOR
+#!Formatando a coluna "CNPJ PRESTADOR"
 data_processor.remove_strings('CPF E OU CNPJ')
 data_processor.trocar_nome_coluna('CPF E OU CNPJ', 'CNPJ PRESTADOR')
 data_processor.type_str('CNPJ PRESTADOR')
 data_processor.remover_0('CNPJ PRESTADOR')
 
-#!Formatando a coluna CNPJ PRESTADOR da base Filial
+#!Formatando a coluna "CNPJ PRESTADOR" da base Filial
 data_processor.type_str_filial('CNPJ PRESTADOR')
 
-#!Combinando os dois dataframes e criando uma coluna de REGIONAL E UF
+#!Combinando os dois dataframes e criando uma coluna de "REGIONAL E UF"
 data_processor.combinar_merge('CNPJ PRESTADOR', 'REGIONAL', 'REGIONAL')
 data_processor.combinar_merge('CNPJ PRESTADOR', 'UF', 'UF')
 
-#!Formatar coluna CNPJ TOMADOR
+#!Formatar coluna "CNPJ TOMADOR"
 data_processor.remove_strings('CPF OU CNPJ')
 data_processor.trocar_nome_coluna('CPF OU CNPJ', 'CNPJ TOMADOR')
 data_processor.type_str('CNPJ TOMADOR')
 data_processor.remover_0('CNPJ TOMADOR')
+data_processor.remove_rows('CNPJ TOMADOR', '25452301000187')
 
-#!Criação da coluna TIPO DE PESSOA
+#!Criação da coluna "TIPO DE PESSOA"
 data_processor.criar_coluna('TIPO DE PESSOA', 'CNPJ TOMADOR')
 
-#!Formatando a coluna de DT COMPETENCIA
+#!Formatando a coluna de "DT COMPETENCIA"
 data_processor.type_str('DT COMPETENCIA')
 data_processor.format_date('DT COMPETENCIA')
 
-#!Criar coluna TIPO DE CONVÊNIO
+#!Criar coluna "TIPO DE CONVÊNIO"
 data_processor.criar_coluna_convenio('TIPO DE CONVÊNIO','CNPJ TOMADOR')
 
-#!Tratando valores ausentes da coluna NOTA FISCAL
+#!Tratando valores ausentes da coluna "NOTA FISCAL"
 data_processor.type_numeric('NOTA FISCAL')
 data_processor.remover_linhas_vazias('NOTA FISCAL')
 data_processor.type_int('NOTA FISCAL')
 
-#!Tratar coluna VALOR LIQUIDO
+#!Tratar coluna "VALOR LIQUIDO"
 data_processor.type_numeric('VALOR LIQUIDO')
 
-#!Tratar valores da coluna CEDENTE/SACADO
+#!Tratar valores da coluna "CEDENTE/SACADO"
 data_processor.type_int('CEDENTE/SACADO')
 
-#!Tratar valores da coluna EMPRESA COLIGADA
+#!Tratar valores da coluna "EMPRESA COLIGADA"
 
 data_processor.substituir_valores('EMPRESA COLIGADA')
 data_processor.type_int('EMPRESA COLIGADA')
 
 #!Salvar arquivo em excel
-#data_processor.save_to_excel('Arquivo.xlsx')
+#data_processor.save_to_excel('Arquivo3.xlsx')
